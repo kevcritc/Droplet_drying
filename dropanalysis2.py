@@ -342,6 +342,7 @@ class Frame(Height):
     def findCA(self, xdata, ydata):
         f,v=curve_fit(self.quadfunc,xdata,ydata)
         x1=self.Qsolve(f)
+        self.R_max=x1
         gradient=-1*self.gradient(x1,f[0], f[1])
         return np.arctan(gradient)*180/pi
     
@@ -381,14 +382,15 @@ class Frame(Height):
                 
                 self.volume=pi*h0*(3*popt[0]**2+h0**2)/6
                 # print('Volume = ',volume)
-                self.CA=popt[1]*180/pi
+               
                 self.ax[0].set_xlabel('radial distance /µm')
                 self.ax[0].set_ylabel('height distance /µm')
                 self.ax[1].set_xlabel('radial distance /µm')
                 self.ax[1].set_ylabel('height distance /µm')
+            
             else:
                 self.volume=np.nan
-                self.CA=np.nan
+              
         except:
             print('no data')
     
@@ -426,12 +428,14 @@ class DropAnalysis:
         self.tdata=[]
         self.voldata=[]
         self.CAdata=[]
+        self.R_max_data=[]
         
         for frame in vid.frames:
             try:    
                 self.voldata.append(frame.volume)
                 self.CAdata.append(frame.C_A)
                 self.tdata.append(frame.time)
+                self.R_max_data.append(frame.R_max)
             except:
 
                 print('Vol data missing')
@@ -444,6 +448,10 @@ class DropAnalysis:
             plt.scatter(self.tdata,self.CAdata)
             plt.xlabel('Time /s')
             plt.ylabel("Contact Angle")
+            plt.show()
+            plt.scatter(self.tdata,self.R_max_data)
+            plt.xlabel('Time /s')
+            plt.ylabel("Mean Radius")
             plt.show()
         except:
             print('no data to plot')
@@ -471,12 +479,12 @@ class DropAnalysis:
 
 if __name__ =='__main__':
     
-    file='20 DegC_400 um_RT_20X_2.mp4'
+    file='20 DegC_400 um_40 degC_20X_2.mp4'
     path='/Users/phykc/OneDrive - University of Leeds/Min Fu'
     ri=1.5160635
     landa=0.480
-    nthframe=50
-    pixelpermicron=3.03
+    nthframe=1
+    pixelpermicron=1/0.66
     startatframe=0
     endframe=3500
     timeperframe=0.121
@@ -485,6 +493,5 @@ if __name__ =='__main__':
     DA=DropAnalysis(file, path, ri, glass_ri, landa, nthframe, pixelpermicron, startatframe, endframe, timeperframe)
 
 
-    
-    
+ 
 
